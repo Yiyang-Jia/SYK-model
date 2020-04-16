@@ -49,6 +49,7 @@ adjRatios1realization =
 Total[adjRatios1realization]/Length[adjRatios1realization]
 
 
+(*Unfolding*)
 unfoldedIndividualList = 
   Table[0, {i, 1, Length[individuallist]}, {j, 1, 2048}];
 Do[
