@@ -1,0 +1,142 @@
+et[n_, q_] := 
+  1/Binomial[n, q]*
+   Sum[(-1)^(q + r)*Binomial[q, r]*Binomial[n - q, q - r], {r, 0, 
+     q}];(*SYK \[Eta] ~ Exp[-2q^2/N]*)
+
+sigdev[n_, q_] := 
+  Sqrt[Binomial[n, 
+     q] (q - 1)!/(2^q*n^(q - 1))];(*many-body standard deviation*)
+
+emx[eta_, sig_] := 
+  4*sig^2/(1 - eta); (*Groud state energy, absolute value*)
+
+rhocc[en_, eta_, sig_, npr_] := 
+  Sqrt[1 - en^2/emx[eta, sig]]*
+   Product[1 - en^2*4/emx[eta, sig]/(eta^n + 1/eta^n + 2), {n, 1, 
+     npr}]; (*Q-Hermite density*)
+
+normConst[eta_, sig_, npr_] := 
+  1/(Pi sig) (1 + eta) Sqrt[1 - eta] Product[(1 - eta^(2 n + 2))/(
+    1 - eta^(2 n + 1)), {n, 1, 
+     npr}];(*normalization constant so that density after integration \
+is 1*)
+rhoN24q4[en_] := 
+  2048*normConst[et[24, 4], sigdev[24, 4], 6] rhocc[en, et[24, 4], 
+    sigdev[24, 4], 
+    6];(*density normalizaed to total number of states 2^11*)
+
+totlist = 
+  ReadList["/home/yiyang/Desktop/Syk/matlabSYK/n=24eigen.txt", Number];
+
+individuallist = 
+  ReadList["/home/yiyang/Desktop/Syk/matlabSYK/n=24eigen.txt", 
+   Table[Number, {2048}]];
+
+(*unfoldedIndividualList=ReadList["unfoldedIndividualListN24q4.txt"];*)
+
+
+
+
+(*Adjacent level spacing ratio*)
+
+spacings1realization = 
+  Table[individuallist[[1]][[k + 1]] - individuallist[[1]][[k]], {k, 
+    1, 2048 - 1}];
+adjRatios1realization = 
+  Table[Min[spacings1realization[[k]], spacings1realization[[k + 1]]]/
+    Max[spacings1realization[[k]], spacings1realization[[k + 1]]], {k,
+     1, 2048 - 2}];
+Total[adjRatios1realization]/Length[adjRatios1realization]
+
+
+unfoldedIndividualList = 
+  Table[0, {i, 1, Length[individuallist]}, {j, 1, 2048}];
+Do[
+ unfoldedIndividualList[[i]][[1]] = individuallist[[i]][[1]];
+ Do[
+  unfoldedIndividualList[[i]][[j + 1]] = 
+    unfoldedIndividualList[[i]][[j]] + 
+     Re[rhoN24q4[
+        individuallist[[i]][[j]]]] (individuallist[[i]][[j + 1]] - 
+        individuallist[[i]][[j]]);
+  , {j, 1, 2048 - 1}];
+ If[Mod[i, 100] == 0, Print[i]]
+ , {i, 1, Length[individuallist]}]
+
+
+
+Export["/home/yiyang/Desktop/Syk/mathematicaSyk/NumericalEigenvalues/\
+unfoldedEigenN24q4.txt", unfoldedIndividualList // Flatten];
+
+
+
+(*Unfolded and connected spectral form factor*)
+
+centers = 
+  Table[(unfoldedIndividualList[[i]][[1]] + 
+      unfoldedIndividualList[[i]][[2048]])/2, {i, 1, 
+    Length[unfoldedIndividualList]}];
+c = Total[centers]/
+  Length[centers];(*center of the unfoled spectrum*)
+w = \
+800;(*regulator to tame sharp edges*)
+normalization = 
+ Abs[Total[Exp[-(1/(2 w^2)) Flatten[unfoldedIndividualList - c]^2]]]^2;
+
+Do[unfoldFormFactor[t, w] = 
+  2048/(normalization/Length[unfoldedIndividualList])
+     Sum[Abs[
+       Total[Exp[
+         I t unfoldedIndividualList[[i]] - 
+          1/(2 w^2) (unfoldedIndividualList[[i]] - c)^2]]]^2, {i, 1, 
+      Length[unfoldedIndividualList]}] - 
+   2048/normalization Abs[
+      Total[Exp[
+        I t Flatten[unfoldedIndividualList] - 
+         1/(2 w^2) Flatten[unfoldedIndividualList - c]^2]]]^2; 
+ If[Mod[t/0.001, 20] == 0, Print[t]], {t, 0, 0.04, 0.0001}]
+
+Export["/home/yiyang/Desktop/Syk/q=2/n=24unfoldedSFFw=800Time0To10.\
+txt", Table[{t, unfoldFormFactor[t, 800]}, {t, 0, 10, 0.1}]]
+
+(*Standard RMT form factors*)
+
+fgoe[t_] := 
+  HeavisideTheta[1 - t]*(2*t - t*Log[1 + 2*t]) + 
+   HeavisideTheta[t - 1]*(2 - t*Log[(2 t + 1)/(2 t - 1)]);
+fgue[t_] := HeavisideTheta[1 - t]*t + HeavisideTheta[t - 1];
+fgse[k_] := 
+  Piecewise[{{-1 + Abs[k]/2 - Abs[k]/4 Log[Abs[1 - Abs[k]]], 
+      Abs[k] < 2}, {0, Abs[k] > 2}}] + 1;
+tgo = Table[{t, fgoe[t/2/Pi]}, {t, 0, 10, 0.01}];
+tgu = Table[{t, fgue[t/2/Pi]}, {t, 0, 10, 0.01}];
+tgs = Table[{t, fgse[t/2/Pi]}, {t, 0, 10, 0.01}];
+
+ListLinePlot[{tgo, 
+  Table[{t, unfoldFormFactor[t, 800]}, {t, 0, 10, 0.1}]}, 
+ PlotLegends -> {"GOE", "N=24 w=800 Numerical"}]
+
+ListLogLogPlot[{tgo, 
+  Table[{t, unfoldFormFactor[t, 800]}, {t, 0, 10, 0.1}]}]
+
+ListLinePlot[Table[{t, unfoldFormFactor[t, 800]}, {t, 0, 0.1, 0.001}]]
+
+ListLogLogPlot[
+ Table[{t, unfoldFormFactor[t, 800]}, {t, 0, 0.04, 0.0001}], 
+ Joined -> True, PlotLabel -> "w=800 early time SFF"]
+
+
+Do[unfoldFormFactorNoRegulator[t] = 
+   1/(2048*Length[unfoldedIndividualList])
+      Sum[Abs[Total[Exp[I t unfoldedIndividualList[[i]]]]]^2, {i, 1, 
+       Length[unfoldedIndividualList]}] - 
+    1/(2048*Length[individuallist]^2)
+      Abs[Total[Exp[I t Flatten[unfoldedIndividualList]]]]^2; 
+  If[Mod[IntegerPart[t/0.01], 10] == 0, Print[t]], {t, 0, 0.4, 0.001}];
+
+ListLinePlot[{tgo, 
+  Table[{t, unfoldFormFactorNoRegulator[t]}, {t, 0, 10, 0.1}]}, 
+ PlotLegends -> {"GOE", "N=24 no regulator"}]
+
+ListLinePlot[{Table[{t, unfoldFormFactorNoRegulator[t]}, {t, 0, 0.4, 
+    0.01}]}, PlotLegends -> {"N=24 no regulator, early time"}]
