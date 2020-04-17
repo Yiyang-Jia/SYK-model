@@ -1,4 +1,5 @@
 diagonalizeq=2: exact diagonalizations of q=2 SYK.
+
 diagonalizeq=4: exact diagonalizations of q=4 SYK.
 
 modules:
