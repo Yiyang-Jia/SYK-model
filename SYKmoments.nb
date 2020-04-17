@@ -28,7 +28,6 @@ et[n_, q_] :=
   1/Binomial[n, q]*
    Sum[(-1)^(q + r)*Binomial[q, r]*Binomial[n - q, q - r], {r, 0, 
      q}];
-etaexp[n_, q_] := (-1)^q (1 - 2 q^2/n + 2 q^2 (q - 1)^2/n^2);
 Clear[momqh, q, p, d];
 momqh[d_, q_, p_] := 
   1/(1 - et[d, q])^p * 
@@ -173,8 +172,8 @@ tan1e[d_, q_] :=
        Sum[Sum[(-1)^(q1 + q2 + m2 + t)*Bn[d - q, q - q1]*Bn[q, q1]*
           Bn[2*q - 2*q1, m2]*Bn[q1, m1]*Bn[m1, s]*Bn[m2, t]*
           Bn[d - 2*q + q1, 2*q - q2 - m1 - m2]*
-          Bn[2*q - q2 - m1 - m2, q2 - s - t]*
-          Bn[2*q - 2*q2, q - q2], {s, 0, q}], {t, 0, q}],
+          Bn[2*q - q2 - m1 - m2, q2 - s - t]*Bn[2*q - 2*q2, q - q2],
+          {s, 0, q}], {t, 0, q}],
        {m1, 0, q1}], {m2, 0, 2*q - 2*q1}], {q1, 0, q}], {q2, 0, q}];
 tan1f[d_, q_] := 
   Bn[d, q]*Sum[
@@ -266,42 +265,18 @@ t12341243[n_, q_] :=
        q]^(-4) Sum[(-1)^(cd + abcd) n!/(n - 4 q + d2 + 3 d4)! 1/(
         ab! ac! ad! bc! bd! cd! abcd!) /. sol12341234[q][[i]], {i, 1, 
        Length[sol12341234[q]]}]];
-t12341234test[n_, q_] := 
-  Module[{d2, d3, d4}, d2 = ab + ac + ad + bc + bd + cd;
-   d4 = abcd;
-   Binomial[n, q]^(-4) Sum[
-     n!/(n - 2 q + 
-         d4)! 1/((bd!)^2 (cd!)^2 ((q - abcd - bd - 
-           cd)!)^2 abcd!), {bd, 0, q}, {cd, 0, q - bd}, {abcd, 0, 
-      q - bd - cd}]];
-(*note the difference in the summation limits of abcd*)
-t12341234testwrong[n_, q_] := 
-  Module[{d2, d3, d4}, d2 = ab + ac + ad + bc + bd + cd;
-   d4 = abcd;
-   Binomial[n, q]^(-4) Sum[
-     n!/(n - 2 q + 
-         d4)! 1/((bd!)^2 (cd!)^2 ((q - abcd - bd - 
-           cd)!)^2 abcd!), {bd, 0, q}, {cd, 0, q}, {abcd, 0, q}]];
 
-t12341243test[n_, q_] := 
-  Module[{d2, d3, d4}, d2 = ab + ac + ad + bc + bd + cd;
-   d4 = abcd;
-   (-1)^q Binomial[n, 
-      q]^(-4) Sum[(-1)^(cd + abcd) n!/(n - 2 q + 
-         d4)! 1/((bd!)^2 (cd!)^2 ((q - abcd - bd - 
-           cd)!)^2 abcd!), {bd, 0, q}, {cd, 0, q - bd}, {abcd, 0, 
-      q - bd - cd}]];
 sol1234ee1234[q_] := 
   sol1234ee1234[q] = 
-   Solve[ab + ac + ad + abe + ace + ade + abcd + abcde == q && 
-     ab + bc + bd + abe + bce + bde + abcd + abcde == q && 
-     ac + bc + cd + ace + bce + cde + abcd + abcde == q && 
-     ad + bd + cd + ade + bde + cde + abcd + abcde == q && 
-     0 <= ab <= q && 0 <= ac <= q && 0 <= ad <= q && 0 <= bc <= q && 
-     0 <= bd <= q && 0 <= cd <= q && 0 <= abe <= q && 0 <= ace <= q &&
-      0 <= ade <= q && 0 <= bce <= q && 0 <= bde <= q && 
-     0 <= cde <= q && 0 <= abcd <= q && 0 <= abcde <= q, {ab, ac, ad, 
-     bc, bd, cd, abe, ace, ade, bce, bde, cde, abcd, abcde}, Integers];
+   Solve[{{1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1}, {1, 0, 0, 1, 1, 
+         0, 1, 0, 0, 1, 1, 0, 1, 1}, {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+          1, 1, 1}, {0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1}}.{ab, 
+        ac, ad, bc, bd, cd, abe, ace, ade, bce, bde, cde, abcd, 
+        abcde} == {q, q, q, q} && 
+     ConstantArray[0, 14] <=  {ab, ac, ad, bc, bd, cd, abe, ace, ade, 
+       bce, bde, cde, abcd, abcde} <= ConstantArray[q, 14], {ab, ac, 
+     ad, bc, bd, cd, abe, ace, ade, bce, bde, cde, abcd, abcde}, 
+    Integers];
 t1234e12e34[n_, q_] := 
   t1234e12e34[n, q] = 
    Module[{d2, d3, d4, d5, aeIntersect, beIntersect}, 
@@ -386,28 +361,26 @@ t1234e1e234[n_, q_] :=
     d4 = abcd; d5 = abcde;
     aeIntersect = abe + ace + ade + abcde; 
     beIntersect = abe + bce + bde + abcde;
-    (-1)^q Binomial[n, 
+    Binomial[n, 
        q]^(-5) Sum[(-1)^(aeIntersect) n!/(n - 5 q + d2 + 2 d3 + 
            3 d4 + 4 d5)! 1/(q - abe - ace - ade - bce - bde - cde - 
            abcde)! 1/(ab! ac! ad! bc! bd! cd!) 1/(
         abe! ace! ade! bce! bde! cde!) 1/abcd! 1/abcde! /. 
        sol1234ee1234[q][[i]], {i, 1, Length[sol1234ee1234[q]]}]];
 
-Clear[ab, ac, ad, ae, bc, bd, be, cd, ce, de, abcd, abce, abde, acde, 
-  bcde];
+
 sol1234512345[q_] := 
   sol1234512345[q] = 
-   Solve[ab + ac + ad + ae + abcd + abce + abde + acde == q && 
-     ab + bc + bd + be + abcd + abce + abde + bcde == q && 
-     ac + bc + cd + ce + abcd + abce + acde + bcde == q && 
-     ad + bd + cd + de + abcd + abde + acde + bcde == q && 
-     ae + be + ce + de + abce + abde + acde + bcde == q && 
-     0 <= ab <= q && 0 <= ac <= q && 0 <= ad <= q && 0 <= bc <= q && 
-     0 <= bd <= q && 0 <= cd <= q && 0 <= ae <= q && 0 <= be <= q && 
-     0 <= ce <= q && 0 <= de <= q && 0 <= abcd <= q && 
-     0 <= abce <= q && 0 <= abde <= q && 0 <= acde <= q && 
-     0 <= bcde <= q, {ab, ac, ad, ae, bc, bd, be, cd, ce, de, abcd, 
-     abce, abde, acde, bcde}, Integers];
+   Solve[{{1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0}, {1, 0, 0, 0, 
+         1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1}, {0, 1, 0, 0, 1, 0, 0, 1, 1,
+          0, 1, 1, 0, 1, 1}, {0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 
+         1, 1}, {0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1}}. {ab, 
+        ac, ad, ae, bc, bd, be, cd, ce, de, abcd, abce, abde, acde, 
+        bcde} == {q, q, q, q, q} && 
+     ConstantArray[0, 15] <= {ab, ac, ad, ae, bc, bd, be, cd, ce, de, 
+       abcd, abce, abde, acde, bcde} <= ConstantArray[q, 15], {ab, ac,
+      ad, ae, bc, bd, be, cd, ce, de, abcd, abce, abde, acde, bcde}, 
+    Integers];
 
 t1234512345[n_, q_] := 
   t1234512345[n, q] = 
@@ -419,26 +392,7 @@ t1234512345[n_, q_] :=
         ab! ac! ad! bc! bd! cd! ae! be! ce! de!) 1/(
         abcd! abce! abde! acde! bcde!) /. sol1234512345[q][[i]], {i, 
        1, Length[sol1234512345[q]]}]];
-t1234512345test[n_, q_] := Module[{ab, ac, ad, ae, bc, d2, d3, d4, d5},
-   (*ab= acde+ bcde+ cd+ce+de-q/2;ac= abde+ bcde+ bd+be+de-q/2;
-   ad=-abcd-abde-acde-bcde-bd-cd-de+q;ae=-abce-abde-acde-bcde-be-ce-
-   de+q;bc=-abcd- abce- abde-acde-2 bcde- bd- be-2cd- ce-de+3 q/2;*)
- 
-     d2 = ab + ac + ad + bc + bd + cd + ae + be + ce + de; d3 = 0;
-   d4 = abcd + abce + abde + acde + bcde; d5 = 0;
-   Binomial[n, q]^(-5) Sum[
-     n!/(n - 5 q + d2 + 2 d3 + 3 d4 + 4 d5)! 1/(
-      ab! ac! ad! bc! bd! cd! ae! be! ce! de!) 1/(
-      abcd! abce! abde! acde! bcde!), {bd, 0, q}, {be, 0, q}, {cd, 0, 
-      q}, {ce, 0, q}, {de, 0, q}, {abcd, 
-      0, -abde - acde - bcde - bd - cd - de + q}, {abce, 
-      0, -abde - acde - bcde - be - ce - de + q}, {abde, 
-      q/2 - bcde - bd - be - de, 
-      3 q/2 - ( bcde + bd + be + de)}, {acde, 
-      q/2 - bcde - cd - ce - de, 
-      3 q/2 - (bcde + cd + ce + de)}, {bcde, 0, 
-      3 q/4-- bd - be - 2 cd - ce - de}
-     ]];
+
 t1234512354[n_, q_] := 
   t1234512354[n, q] = 
    Module[{d2, d3, d4, d5, deIntersect}, 
@@ -509,26 +463,21 @@ t1234512345another[n_, q_] :=
 (*Double traces with 6 index sets,  much more run time*)
 
 solee1234ff1234[q_] := solee1234ff1234[q] =
-   Solve[ab + ac + ad + abe + ace + ade + abf + acf + adf + abef + 
-       acef + adef + abcd + abcde + abcdf + abcdef == q && 
-     ab + bc + bd + abe + bce + bde + abf + bcf + bdf + abef + bcef + 
-       bdef + abcd + abcde + abcdf + abcdef == q && 
-     ac + bc + cd + ace + bce + cde + acf + bcf + cdf + acef + bcef + 
-       cdef + abcd + abcde + abcdf + abcdef == q && 
-     ad + bd + cd + ade + bde + cde + adf + bdf + cdf + adef + bdef + 
-       cdef + abcd + abcde + abcdf + abcdef == q && 0 <= ab <= q && 
-     0 <= ac <= q && 0 <= ad <= q && 0 <= bc <= q && 0 <= bd <= q && 
-     0 <= cd <= q && 0 <= ef <= q && 0 <= abe <= q && 0 <= ace <= q &&
-      0 <= ade <= q && 0 <= bce <= q && 0 <= bde <= q && 
-     0 <= cde <= q && 0 <= abf <= q && 0 <= acf <= q && 
-     0 <= adf <= q && 0 <= bcf <= q && 0 <= bdf <= q && 
-     0 <= cdf <= q && 0 <= abef <= q && 0 <= acef <= q && 
-     0 <= adef <= q && 0 <= bcef <= q && 0 <= bdef <= q && 
-     0 <= cdef <= q && 0 <= abcd <= q && 0 <= abcde <= q && 
-     0 <= abcdf <= q && 0 <= abcdef <= q, {ab, ac, ad, bc, bd, cd, ef,
-      abe, ace, ade, bce, bde, cde, abf, acf, adf, bcf, bdf, cdf, 
-     abef, acef, adef, bcef, bdef, cdef, abcd, abcde, abcdf, abcdef}, 
-    Integers];
+   Solve[{{1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1,
+          1, 1, 0, 0, 0, 1, 1, 1, 1}, {1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 
+         1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1}, {0,
+          1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 
+         0, 1, 0, 1, 1, 1, 1, 1}, {0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1,
+          1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1}}.{ab, ac,
+         ad, bc, bd, cd, ef, abe, ace, ade, bce, bde, cde, abf, acf, 
+        adf, bcf, bdf, cdf, abef, acef, adef, bcef, bdef, cdef, abcd, 
+        abcde, abcdf, abcdef} == q && 
+     ConstantArray[0, 29] <= {ab, ac, ad, bc, bd, cd, ef, abe, ace, 
+       ade, bce, bde, cde, abf, acf, adf, bcf, bdf, cdf, abef, acef, 
+       adef, bcef, bdef, cdef, abcd, abcde, abcdf, abcdef} <= 
+      ConstantArray[q, 29], {ab, ac, ad, bc, bd, cd, ef, abe, ace, 
+     ade, bce, bde, cde, abf, acf, adf, bcf, bdf, cdf, abef, acef, 
+     adef, bcef, bdef, cdef, abcd, abcde, abcdf, abcdef}, Integers];
 
 
 (*should equal tt12341234*)
@@ -593,8 +542,9 @@ te12e34f12f43[n_, q_] :=
   te12e34f12f43[n, q] = 
    Module[{d2, d3, d4, d5, d6, aeIntersect, beIntersect, afIntersect, 
      bfIntersect, cdIntersect}, d2 = ab + ac + ad + bc + bd + cd + ef;
-     d3 = abe + ace + ade + bce + bde + cde + abf + acf + adf + bcf + 
-      bdf + cdf;
+     d3 = 
+     abe + ace + ade + bce + bde + cde + abf + acf + adf + bcf + bdf +
+       cdf;
     d4 = abef + acef + adef + bcef + bdef + cdef + abcd; 
     d5 = abcde + abcdf; d6 = abcdef;
     aeIntersect = 
@@ -770,36 +720,104 @@ te12e34f14f32[n_, q_] :=
         abcde! abcdf!) 1/abcdef! /. solee1234ff1234[q][[i]], {i, 1, 
        Length[solee1234ff1234[q]]}]];
 
-
+(*k=6 all crossed*)
+\
 (*{ab,ac,ad,ae,af,bc,bd,be,bf,cd,ce,cf,de,df,ef,abcd,abce,abcf,abde,\
 abdf,abef,acde,acdf,acef,adef,bcde,bcdf,bcef,bdef,cdef,abcdef}*)
 
+variables123456123456 = {ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, 
+   cf, de, df, ef, abcd, abce, abcf, abde, abdf, abef, acde, acdf, 
+   acef, adef, bcde, bcdf, bcef, bdef, cdef, abcdef};
+labelsVariables123456123456 = 
+  Table[{ToString[variables123456123456[[i]]], i}, {i, 1, 
+    variables123456123456 // Length}];
+coeMatrix123456123456 = ConstantArray[0, {6, 31}];
+For[j = 1, j < 32, j++, 
+  coeMatrix123456123456[[1, j]] = 
+    StringContainsQ[labelsVariables123456123456[[j]][[1]], "a"] // 
+     Boole;
+  ];
+For[j = 1, j < 32, j++, 
+  coeMatrix123456123456[[2, j]] = 
+    StringContainsQ[labelsVariables123456123456[[j]][[1]], "b"] // 
+     Boole;
+  ];
+For[j = 1, j < 32, j++, 
+  coeMatrix123456123456[[3, j]] = 
+    StringContainsQ[labelsVariables123456123456[[j]][[1]], "c"] // 
+     Boole;
+  ];
+For[j = 1, j < 32, j++, 
+  coeMatrix123456123456[[4, j]] = 
+    StringContainsQ[labelsVariables123456123456[[j]][[1]], "d"] // 
+     Boole;
+  ];
+For[j = 1, j < 32, j++, 
+  coeMatrix123456123456[[5, j]] = 
+    StringContainsQ[labelsVariables123456123456[[j]][[1]], "e"] // 
+     Boole;
+  ];
+For[j = 1, j < 32, j++, 
+  coeMatrix123456123456[[6, j]] = 
+    StringContainsQ[labelsVariables123456123456[[j]][[1]], "f"] // 
+     Boole;
+  ];
+
 sol123456123456[q_] := 
   sol123456123456[q] = 
-   Solve[ab + ac + ad + ae + af + abcd + abce + abcf + abde + abdf + 
-       abef + acde + acdf + acef + adef + abcdef == q && 
-     ab + bc + bd + be + bf + abcd + abce + abcf + abde + abdf + 
-       abef + bcde + bcdf + bcef + bdef + abcdef == q && 
-     ac + bc + cd + ce + cf + abcd + abce + abcf + acde + acdf + 
-       acef + bcde + bcdf + bcef + cdef + abcdef == q && 
-     Plus[ad, bd, cd, de, df, abcd, abde, abdf, acde, acde, adef, 
-       bcde, bcdf, bdef, cdef, abcdef] == q && 
-     Plus[ae, be, ce, de, ef, abce, abde, abef, acde, acef, adef, 
-       bcde, bcef, bdef, cdef, abcdef] == q && 
-     Plus[af, bf, cf, df, ef, abcf, abdf, abef, acdf, acef, adef, 
-       bcdf, bcef, bdef, cdef, abcdef] == q && 0 <= ab <= q && 
-     0 <= ac <= q && 0 <= ad <= q && 0 <= ae <= q && 0 <= af <= q && 
-     0 <= bc <= q && 0 <= bd <= q && 0 <= be <= q && 0 <= bf <= q && 
-     0 <= cd <= q && 0 <= ce <= q && 0 <= cf <= q && 0 <= de <= q && 
-     0 <= df <= q && 0 <= ef <= q && 0 <= abcd <= q && 
-     0 <= abce <= q && 0 <= abcf <= q && 0 <= abde <= q && 
-     0 <= abdf <= q && 0 <= abef <= q && 0 <= acde <= q && 
-     0 <= acdf <= q && 0 <= acef <= q && 0 <= adef <= q && 
-     0 <= bcde <= q && 0 <= bcdf <= q && 0 <= bcef <= q && 
-     0 <= bdef <= q && 0 <= cdef <= q && 0 <= abcdef <= q, {ab, ac, 
-     ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, ef, abcd, abce, 
-     abcf, abde, abdf, abef, acde, acdf, acef, adef, bcde, bcdf, bcef,
-      bdef, cdef, abcdef}];
+   Solve[coeMatrix123456123456.variables123456123456 == 
+      ConstantArray[q, 6] && 
+     ConstantArray[0, 31] <= variables123456123456 <= 
+      ConstantArray[q, 31], variables123456123456, Integers];
+efIntersect66 = 
+  Sum[variables123456123456[[
+     i]] Boole[(StringContainsQ[labelsVariables123456123456[[i]][[1]],
+         "e"]) && (StringContainsQ[
+        labelsVariables123456123456[[i]][[1]], "f"])], {i, 1, 
+    variables123456123456 // Length}];
+deIntersect66 = 
+  Sum[variables123456123456[[
+     i]] Boole[(StringContainsQ[labelsVariables123456123456[[i]][[1]],
+         "d"]) && (StringContainsQ[
+        labelsVariables123456123456[[i]][[1]], "e"])], {i, 1, 
+    variables123456123456 // Length}];
+dfIntersect66 = 
+  Sum[variables123456123456[[
+     i]] Boole[(StringContainsQ[labelsVariables123456123456[[i]][[1]],
+         "d"]) && (StringContainsQ[
+        labelsVariables123456123456[[i]][[1]], "f"])], {i, 1, 
+    variables123456123456 // Length}];
+cdIntersect66 = 
+  Sum[variables123456123456[[
+     i]] Boole[(StringContainsQ[labelsVariables123456123456[[i]][[1]],
+         "c"]) && (StringContainsQ[
+        labelsVariables123456123456[[i]][[1]], "d"])], {i, 1, 
+    variables123456123456 // Length}];
+cfIntersect66 = 
+  Sum[variables123456123456[[
+     i]] Boole[(StringContainsQ[labelsVariables123456123456[[i]][[1]],
+         "c"]) && (StringContainsQ[
+        labelsVariables123456123456[[i]][[1]], "f"])], {i, 1, 
+    variables123456123456 // Length}];
+ceIntersect66 = 
+  Sum[variables123456123456[[
+     i]] Boole[(StringContainsQ[labelsVariables123456123456[[i]][[1]],
+         "c"]) && (StringContainsQ[
+        labelsVariables123456123456[[i]][[1]], "e"])], {i, 1, 
+    variables123456123456 // Length}];
+beIntersect66 = 
+  Sum[variables123456123456[[
+     i]] Boole[(StringContainsQ[labelsVariables123456123456[[i]][[1]],
+         "b"]) && (StringContainsQ[
+        labelsVariables123456123456[[i]][[1]], "e"])], {i, 1, 
+    variables123456123456 // Length}];
+bcIntersect66 = 
+  Sum[variables123456123456[[
+     i]] Boole[(StringContainsQ[labelsVariables123456123456[[i]][[1]],
+         "b"]) && (StringContainsQ[
+        labelsVariables123456123456[[i]][[1]], "c"])], {i, 1, 
+    variables123456123456 // Length}];
+
 
 
 t123456123456[n_, q_] := 
@@ -815,17 +833,146 @@ t123456123456[n_, q_] :=
          1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
 adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
        sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
-
+t123456123465[n_, q_] := 
+  t123456123465[n, q] = 
+   Module[{d2, d4, d6}, 
+    d2 = Plus[ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, 
+      ef]; d4 = 
+     Plus[abcd, abce, abcf, abde, abdf, abef, acde, acdf, acef, adef, 
+      bcde, bcdf, bcef, bdef, cdef]; d6 = abcdef;
+    (-1)^q Binomial[n, 
+       q]^(-6) Sum[(-1)^(efIntersect66 ) n!/(n - 6 q + d2 + 3 d4 + 
+           5 d6)! 1/(
+        ab! ac! ad! ae! af! bc! bd! be! bf! cd! ce! cf! de! df! ef!)
+         1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
+adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
+       sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
+t123456123564[n_, q_] := 
+  t123456123564[n, q] = 
+   Module[{d2, d4, d6}, 
+    d2 = Plus[ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, 
+      ef]; d4 = 
+     Plus[abcd, abce, abcf, abde, abdf, abef, acde, acdf, acef, adef, 
+      bcde, bcdf, bcef, bdef, cdef]; d6 = abcdef;
+    Binomial[n, 
+       q]^(-6) Sum[(-1)^(deIntersect66 + dfIntersect66) n!/(n - 6 q + 
+           d2 + 3 d4 + 5 d6)! 1/(
+        ab! ac! ad! ae! af! bc! bd! be! bf! cd! ce! cf! de! df! ef!)
+         1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
+adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
+       sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
+t123456123654[n_, q_] := 
+  t123456123654[n, q] = 
+   Module[{d2, d4, d6}, 
+    d2 = Plus[ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, 
+      ef]; d4 = 
+     Plus[abcd, abce, abcf, abde, abdf, abef, acde, acdf, acef, adef, 
+      bcde, bcdf, bcef, bdef, cdef]; d6 = abcdef;
+    (-1)^q Binomial[n, 
+       q]^(-6) Sum[(-1)^(deIntersect66 + dfIntersect66 + 
+           efIntersect66) n!/(n - 6 q + d2 + 3 d4 + 5 d6)! 1/(
+        ab! ac! ad! ae! af! bc! bd! be! bf! cd! ce! cf! de! df! ef!)
+         1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
+adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
+       sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
+t123456124365[n_, q_] := 
+  t123456124365[n, q] = 
+   Module[{d2, d4, d6}, 
+    d2 = Plus[ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, 
+      ef]; d4 = 
+     Plus[abcd, abce, abcf, abde, abdf, abef, acde, acdf, acef, adef, 
+      bcde, bcdf, bcef, bdef, cdef]; d6 = abcdef;
+    Binomial[n, 
+       q]^(-6) Sum[(-1)^(cdIntersect66 + efIntersect66) n!/(n - 6 q + 
+           d2 + 3 d4 + 5 d6)! 1/(
+        ab! ac! ad! ae! af! bc! bd! be! bf! cd! ce! cf! de! df! ef!)
+         1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
+adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
+       sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
+t123456124635[n_, q_] := 
+  t123456124635[n, q] = 
+   Module[{d2, d4, d6}, 
+    d2 = Plus[ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, 
+      ef]; d4 = 
+     Plus[abcd, abce, abcf, abde, abdf, abef, acde, acdf, acef, adef, 
+      bcde, bcdf, bcef, bdef, cdef]; d6 = abcdef;
+    (-1)^q Binomial[n, 
+       q]^(-6) Sum[(-1)^(cdIntersect66 + efIntersect66 + 
+           cfIntersect66) n!/(n - 6 q + d2 + 3 d4 + 5 d6)! 1/(
+        ab! ac! ad! ae! af! bc! bd! be! bf! cd! ce! cf! de! df! ef!)
+         1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
+adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
+       sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
+t123456124653[n_, q_] := 
+  t123456124653[n, q] = 
+   Module[{d2, d4, d6}, 
+    d2 = Plus[ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, 
+      ef]; d4 = 
+     Plus[abcd, abce, abcf, abde, abdf, abef, acde, acdf, acef, adef, 
+      bcde, bcdf, bcef, bdef, cdef]; d6 = abcdef;
+    Binomial[n, 
+       q]^(-6) Sum[(-1)^(cdIntersect66 + efIntersect66 + 
+           cfIntersect66 + ceIntersect66) n!/(n - 6 q + d2 + 3 d4 + 
+           5 d6)! 1/(
+        ab! ac! ad! ae! af! bc! bd! be! bf! cd! ce! cf! de! df! ef!)
+         1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
+adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
+       sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
+t123456125634[n_, q_] := 
+  t123456125634[n, q] = 
+   Module[{d2, d4, d6}, 
+    d2 = Plus[ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, 
+      ef]; d4 = 
+     Plus[abcd, abce, abcf, abde, abdf, abef, acde, acdf, acef, adef, 
+      bcde, bcdf, bcef, bdef, cdef]; d6 = abcdef;
+    Binomial[n, 
+       q]^(-6) Sum[(-1)^(ceIntersect66 + cfIntersect66 + 
+           deIntersect66 + dfIntersect66) n!/(n - 6 q + d2 + 3 d4 + 
+           5 d6)! 1/(
+        ab! ac! ad! ae! af! bc! bd! be! bf! cd! ce! cf! de! df! ef!)
+         1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
+adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
+       sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
+t123456135264[n_, q_] := 
+  t123456135264[n, q] = 
+   Module[{d2, d4, d6}, 
+    d2 = Plus[ab, ac, ad, ae, af, bc, bd, be, bf, cd, ce, cf, de, df, 
+      ef]; d4 = 
+     Plus[abcd, abce, abcf, abde, abdf, abef, acde, acdf, acef, adef, 
+      bcde, bcdf, bcef, bdef, cdef]; d6 = abcdef;
+    Binomial[n, 
+       q]^(-6) Sum[(-1)^(bcIntersect66 + beIntersect66 + 
+           deIntersect66 + dfIntersect66) n!/(n - 6 q + d2 + 3 d4 + 
+           5 d6)! 1/(
+        ab! ac! ad! ae! af! bc! bd! be! bf! cd! ce! cf! de! df! ef!)
+         1/(abcd! abce! abcf! abde! abdf! abef! acde! acdf! acef! \
+adef! bcde! bcdf! bcef! bdef! cdef!) 1/abcdef! /. 
+       sol123456123456[q][[i]], {i, 1, Length[sol123456123456[q]]}]];
 ttr33[n_, q_] := 3 (1 + (-1)^Binomial[q, 2]) t123123[n, q];
 ttr44[n_, q_] := (1 + 8/Binomial[n, q]) mom4[n, q]^2 + 
    8 t12341234[n, q] + 16 t12341243[n, q];
+ttrconnected44[n_, q_] := ttr44[n, q] - mom4[n, q]^2;
 ttr35[n_, q_] := 
   15 (1 + et[n, q]) (1 + (-1)^Binomial[q, 2]) t123123[n, q];
 ttr46[n_, q_] := (1 + 12/Binomial[n, q]) mom4[n, q] mom6[n, q] + 
    6 (1 + et[n, q]) (8 t12341234[n, q] + 16 t12341243[n, q]) + 
    3*8 (t1234e12e34[n, q] + t1234e12e43[n, q] + t1234e13e24[n, q]);
+ttrconnected46[n_, q_] = ttr46[n, q] - mom4[n, q] mom6[n, q];
 ttr55[n_, q_] := 
   3*25 (1 + (-1)^Binomial[q, 2]) (1 + et[n, q])^2 t123123[n, q] + 
    5 (1 + (-1)^Binomial[q, 2]) (t1234512345[n, q] + 
       5 t1234512354[n, q] + 5 t1234512453[n, q] + t1234513524[n, q]);
-
+ttr66[n_, q_] := 
+  mom6[n, q]^2 + 18/Binomial[n, q] mom6[n, q]^2 + 
+   36 (1 + et[n, q])^2 *(8 t12341234[n, q] + 16 t12341243[n, q]) + 
+   36*8*(1 + et[n, q]) (t1234e12e34[n, q] + t1234e12e43[n, q] + 
+      t1234e13e24[n, q]) + 
+   36 (te12e34f12f34[n, q] + te12e34f12f43[n, q] + 
+      te12e34f13f24[n, q] + 2 te12e34f13f42[n, q] + 
+      te12e34f14f32[n, q]) + 
+   12 (t123456123456[n, q] + 6*t123456123465[n, q] + 
+      12*t123456123564[n, q] + 3*t123456123654[n, q] + 
+      9*t123456124365[n, q] + 12*t123456124635[n, q] + 
+      12*t123456124653[n, q] + 2*t123456125634[n, q] + 
+      3*t123456135264[n, q]);
+ttrconnected66[n_, q_] := ttr66[n, q] - mom6[n, q]^2;
