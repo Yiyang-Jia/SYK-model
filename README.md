@@ -1,6 +1,8 @@
 # SYK-model
 Codes for studying the SYK model.
 
+MATLABcodes folder contains codes for constructing the SYK Hamiltonian and doing the exact diagonalization.
+
 spectral-form-factor.nb: 
     1. import data from exact diagonalization of SYK Hamiltonian (raw data generated from the ''MATLABcodes'' folder in this                      repository),
     2. calcualte average adjacent level spacing ratio,
