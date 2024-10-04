@@ -16,4 +16,4 @@ SYKmoments.nb: calculates the single-trace moments (up to Tr H^8) and double-tra
 
 double-trace-chord-diagram-classification: 
     1. find equivalent chord diagrams due to cyclic permutation and reflection of ordering of gamaa matrices inside the two traces,
-    2. different classes chord diagrams can still have the same intersection structures after this classification, that I    work out by hands.
+    2. different classes chord diagrams can still have the same intersection structures after this classification, that I worked out by hands.
